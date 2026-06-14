@@ -61,8 +61,13 @@
       {% endif %}
     </td>
     <td style="white-space:nowrap">
-      <a href="{{ url_for('approve_jadwal', jid=j.id) }}" class="btn btn-sm btn-success" title="Setujui">✓</a>
-      <a href="{{ url_for('reject_jadwal', jid=j.id) }}" class="btn btn-sm btn-danger" title="Tolak">✗</a>
+      <!-- FIXME: -->
+      <form method="POST" action="{{ url_for('approve_jadwal', jid=j.id) }}" style="display:inline" onsubmit="return confirm('Setujui jadwal ini?')">
+        <button type="submit" class="btn btn-sm btn-success">✓</button>
+      </form>
+      <form method="POST" action="{{ url_for('reject_jadwal', jid=j.id) }}" style="display:inline" onsubmit="return confirm('Tolak jadwal ini?')">
+        <button type="submit" class="btn btn-sm btn-danger">✗</button>
+      </form>
       <a href="{{ url_for('hapus_jadwal_admin', jid=j.id) }}" class="btn btn-sm" onclick="return confirm('Hapus jadwal ini?')" title="Hapus">🗑</a>
     </td>
   </tr>

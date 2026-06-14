@@ -400,7 +400,7 @@ def admin_jadwal():
         return render_template('admin_jadwal.html', rows=rows, clashes=clashes,
             greedy=greedy, tanggal=tanggal)
 
-@app.route('/admin/jadwal/approve/<int:jid>')
+@app.route('/admin/jadwal/approve/<int:jid>', methods=['GET','POST'])
 @login_required('admin')
 def approve_jadwal(jid):
     with get_db() as db:
@@ -409,7 +409,7 @@ def approve_jadwal(jid):
     flash('Jadwal disetujui.','success')
     return redirect(request.referrer or url_for('admin_jadwal'))
 
-@app.route('/admin/jadwal/reject/<int:jid>')
+@app.route('/admin/jadwal/reject/<int:jid>', methods=['GET','POST'])
 @login_required('admin')
 def reject_jadwal(jid):
     with get_db() as db:
