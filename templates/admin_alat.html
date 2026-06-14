@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Alat Gym — FitTime Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">🏋️ Manajemen Alat Gym</div>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">Tambah Alat Baru</div>
+    <form method="POST">
+      <div class="fgroup"><label>Nama Alat *</label><input name="nama" type="text" required placeholder="Contoh: Smith Machine" /></div>
+      <div class="fgroup"><label>Deskripsi</label><input name="deskripsi" type="text" placeholder="Singkat tentang alat ini" /></div>
+      <div class="fgroup"><label>Kapasitas (orang bersamaan)</label><input name="kapasitas" type="number" min="1" value="1" /></div>
+      <button type="submit" class="btn-primary">➕ Tambah Alat</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-title">Daftar Alat ({{ alat_list|length }})</div>
+    {% if alat_list %}
+    <table><thead><tr><th>Alat</th><th>Kap.</th><th>Total Sesi</th><th>Status</th><th></th></tr></thead><tbody>
+    {% for a in alat_list %}
+    <tr>
+      <td>
+        <strong>{{ a.nama }}</strong>
+        {% if a.deskripsi %}<div style="font-size:11px;color:var(--text3)">{{ a.deskripsi }}</div>{% endif %}
+      </td>
+      <td style="font-size:12px;text-align:center">{{ a.kapasitas }}</td>
+      <td><span class="chip">{{ a.total_pakai }} sesi</span></td>
+      <td>
+        {% if a.aktif %}<span class="badge b-ok">Aktif</span>
+        {% else %}<span class="badge b-clash">Nonaktif</span>{% endif %}
+      </td>
+      <td style="white-space:nowrap">
+        <a href="{{ url_for('toggle_alat', aid=a.id) }}" class="btn btn-sm" title="{{ 'Nonaktifkan' if a.aktif else 'Aktifkan' }}">
+          {{ '⏸' if a.aktif else '▶' }}
+        </a>
+        <a href="{{ url_for('hapus_alat', aid=a.id) }}" class="btn btn-sm btn-danger"
+           onclick="return confirm('Hapus alat {{ a.nama }}? Semua jadwal terkait akan dihapus.')">🗑</a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada alat gym.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

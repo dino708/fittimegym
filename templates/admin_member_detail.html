@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Detail Member — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">👤 {{ user.nama_lengkap or user.username }}</div>
+  <a href="{{ url_for('admin_member') }}" class="btn">← Kembali</a>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">Data Diri</div>
+    <table>
+      <tr><td style="color:var(--text2);width:130px">Nama Lengkap</td><td><strong>{{ user.nama_lengkap or '—' }}</strong></td></tr>
+      <tr><td style="color:var(--text2)">Username</td><td><code>{{ user.username }}</code></td></tr>
+      <tr><td style="color:var(--text2)">Email</td><td>{{ user.email or '—' }}</td></tr>
+      <tr><td style="color:var(--text2)">No. HP</td><td>{{ user.no_hp or '—' }}</td></tr>
+      <tr><td style="color:var(--text2)">Tanggal Lahir</td><td>{{ user.tanggal_lahir or '—' }}</td></tr>
+      <tr><td style="color:var(--text2)">Jenis Kelamin</td><td>{{ 'Laki-laki' if user.jenis_kelamin=='L' else 'Perempuan' if user.jenis_kelamin=='P' else '—' }}</td></tr>
+      <tr><td style="color:var(--text2)">Berat Badan</td><td>{{ user.berat_badan or '—' }} kg</td></tr>
+      <tr><td style="color:var(--text2)">Tinggi Badan</td><td>{{ user.tinggi_badan or '—' }} cm</td></tr>
+      {% if user.berat_badan and user.tinggi_badan %}
+      <tr><td style="color:var(--text2)">BMI</td><td><strong>{{ "%.1f"|format(user.berat_badan/((user.tinggi_badan/100)**2)) }}</strong></td></tr>
+      {% endif %}
+      <tr><td style="color:var(--text2)">Tujuan Latihan</td><td>{{ user.tujuan_latihan or '—' }}</td></tr>
+      <tr><td style="color:var(--text2)">Bergabung</td><td style="font-size:12px">{{ user.created_at }}</td></tr>
+    </table>
+  </div>
+  <div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">⏰ Waktu Senggang</div>
+      {% if ws %}
+      <table><thead><tr><th>Hari</th><th>Jam Mulai</th><th>Jam Selesai</th></tr></thead><tbody>
+      {% for w in ws %}<tr><td>{{ w.hari }}</td><td>{{ w.jam_mulai }}</td><td>{{ w.jam_selesai }}</td></tr>{% endfor %}
+      </tbody></table>
+      {% else %}<div class="empty">Belum ada waktu senggang.</div>{% endif %}
+    </div>
+    <div class="card">
+      <div class="section-title">📅 Riwayat Jadwal ({{ jadwal|length }})</div>
+      {% if jadwal %}
+      <table><thead><tr><th>Alat</th><th>Tanggal</th><th>Waktu</th><th>Status</th></tr></thead><tbody>
+      {% for j in jadwal %}
+      <tr>
+        <td><span class="chip">{{ j.alat_nama }}</span></td>
+        <td style="font-size:12px">{{ j.tanggal }}</td>
+        <td style="font-size:12px;color:var(--text2)">{{ j.jam_mulai }}–{{ j.jam_selesai }}</td>
+        <td>
+          {% if j.status=='approved' %}<span class="badge b-ok">Disetujui</span>
+          {% elif j.status=='rejected' %}<span class="badge b-clash">Ditolak</span>
+          {% else %}<span class="badge b-gray">Menunggu</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody></table>
+      {% else %}<div class="empty">Belum ada jadwal.</div>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Admin — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">📊 Dashboard Admin</div>
+  <span style="font-size:12px;color:var(--text3)" id="clock"></span>
+</div>
+
+<div class="grid-4" style="margin-bottom:14px">
+  <div class="stat-card"><div class="stat-lbl">👥 Total Member</div><div class="stat-val">{{ total_member }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">📅 Jadwal Hari Ini</div><div class="stat-val">{{ jadwal_hari_ini|length }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">⚠️ Bentrok</div><div class="stat-val" style="color:{% if total_clash %}var(--red){% else %}var(--green){% endif %}">{{ total_clash }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">🏋️ Alat Aktif</div><div class="stat-val">{{ total_alat }}</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+      Jadwal Hari Ini ({{ today }})
+      <a href="{{ url_for('admin_jadwal') }}" class="btn btn-sm">Lihat semua →</a>
+    </div>
+    {% if jadwal_hari_ini %}
+    <table><thead><tr><th>Member</th><th>Alat</th><th>Waktu</th><th>Status</th></tr></thead><tbody>
+    {% for j in jadwal_hari_ini %}
+    <tr>
+      <td>{{ j.nama }}</td>
+      <td><span class="chip">{{ j.alat_nama }}</span></td>
+      <td style="font-size:12px;color:var(--text2)">{{ j.jam_mulai }}–{{ j.jam_selesai }}</td>
+      <td>{% if j.id in clashes %}<span class="badge b-clash">⚠ Bentrok</span>{% else %}<span class="badge b-ok">✓ Aman</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada jadwal hari ini</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title">⚠️ Bentrok Jadwal Hari Ini</div>
+    {% if total_clash > 0 %}
+    <div class="alert alert-danger">{{ total_clash }} jadwal terdeteksi bentrok. Segera tinjau dan jalankan algoritma Greedy.</div>
+    <a href="{{ url_for('admin_jadwal') }}" class="btn btn-primary" style="margin-top:4px">⚡ Buka Penjadwalan Greedy</a>
+    {% else %}
+    <div class="empty" style="color:var(--green-t)">✅ Tidak ada bentrok jadwal hari ini!</div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+setInterval(()=>{
+  const el=document.getElementById('clock');
+  if(el)el.textContent=new Date().toLocaleString('id-ID');
+},1000);
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Jadwal Saya — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">📅 Jadwal Latihan Saya</div>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">Daftar Jadwal Baru</div>
+    <form method="POST">
+      <div class="fgroup"><label>Alat Gym *</label>
+        <select name="alat_id" required>
+          <option value="">— Pilih alat —</option>
+          {% for a in alat_list %}<option value="{{ a.id }}">{{ a.nama }}{% if a.deskripsi %} — {{ a.deskripsi }}{% endif %}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fgroup"><label>Tanggal *</label><input name="tanggal" type="date" required value="{{ today }}" min="{{ today }}" /></div>
+      <div class="grid-2">
+        <div class="fgroup"><label>Jam Mulai *</label><input name="jam_mulai" type="time" required value="07:00" /></div>
+        <div class="fgroup"><label>Jam Selesai *</label><input name="jam_selesai" type="time" required value="08:00" /></div>
+      </div>
+      <div class="fgroup"><label>Catatan</label><textarea name="catatan" rows="2" placeholder="Opsional — program latihan, target, dll."></textarea></div>
+      <button type="submit" class="btn-primary">📝 Daftarkan Jadwal</button>
+    </form>
+  </div>
+  <div class="card">
+    <div class="section-title">Riwayat Jadwal Saya ({{ my_jadwal|length }})</div>
+    {% if my_jadwal %}
+    <table><thead><tr><th>Alat</th><th>Tanggal</th><th>Waktu</th><th>Status</th><th></th></tr></thead><tbody>
+    {% for j in my_jadwal %}
+    <tr>
+      <td><span class="chip">{{ j.alat_nama }}</span></td>
+      <td style="font-size:12px">{{ j.tanggal }}</td>
+      <td style="font-size:12px;color:var(--text2)">{{ j.jam_mulai }}–{{ j.jam_selesai }}</td>
+      <td>
+        {% if j.status=='approved' %}<span class="badge b-ok">✓ Disetujui</span>
+        {% elif j.status=='rejected' %}<span class="badge b-clash">✗ Ditolak</span>
+        {% else %}<span class="badge b-gray">Menunggu</span>{% endif %}
+      </td>
+      <td><a href="{{ url_for('hapus_jadwal_member', jid=j.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Hapus jadwal ini?')">🗑</a></td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada jadwal. Daftarkan jadwal latihan pertama Anda!</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

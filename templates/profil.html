@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Profil Saya — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">👤 Profil Saya</div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">Data Diri</div>
+    <form method="POST">
+      <div class="fgroup"><label>Nama Lengkap *</label><input name="nama_lengkap" type="text" value="{{ user.nama_lengkap or '' }}" required /></div>
+      <div class="fgroup"><label>Email</label><input name="email" type="email" value="{{ user.email or '' }}" placeholder="email@contoh.com" /></div>
+      <div class="fgroup"><label>No. HP / WhatsApp</label><input name="no_hp" type="text" value="{{ user.no_hp or '' }}" placeholder="08xxxxxxxxxx" /></div>
+      <div class="grid-2">
+        <div class="fgroup"><label>Tanggal Lahir</label><input name="tanggal_lahir" type="date" value="{{ user.tanggal_lahir or '' }}" /></div>
+        <div class="fgroup"><label>Jenis Kelamin</label>
+          <select name="jenis_kelamin">
+            <option value="">— Pilih —</option>
+            <option value="L" {% if user.jenis_kelamin=='L' %}selected{% endif %}>Laki-laki</option>
+            <option value="P" {% if user.jenis_kelamin=='P' %}selected{% endif %}>Perempuan</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="fgroup"><label>Berat Badan (kg)</label><input name="berat_badan" type="number" step="0.1" value="{{ user.berat_badan or '' }}" placeholder="65" /></div>
+        <div class="fgroup"><label>Tinggi Badan (cm)</label><input name="tinggi_badan" type="number" step="0.1" value="{{ user.tinggi_badan or '' }}" placeholder="170" /></div>
+      </div>
+      <div class="fgroup"><label>Tujuan Latihan</label>
+        <select name="tujuan_latihan">
+          <option value="">— Pilih tujuan —</option>
+          {% for t in ['Menurunkan berat badan','Membentuk otot','Meningkatkan stamina','Menjaga kesehatan','Membentuk tubuh ideal','Rehabilitasi cedera','Lainnya'] %}
+          <option value="{{ t }}" {% if user.tujuan_latihan==t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">💾 Simpan Profil</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="section-title">Info Akun</div>
+      <table>
+        <tr><td style="color:var(--text2);width:120px">Username</td><td><code>{{ user.username }}</code></td></tr>
+        <tr><td style="color:var(--text2)">Role</td><td><span class="badge b-info">{{ user.role|capitalize }}</span></td></tr>
+        <tr><td style="color:var(--text2)">Bergabung</td><td style="font-size:12px">{{ user.created_at }}</td></tr>
+        {% if user.berat_badan and user.tinggi_badan %}
+        <tr><td style="color:var(--text2)">BMI</td>
+          <td>
+            {% set bmi = user.berat_badan / ((user.tinggi_badan/100)**2) %}
+            <strong>{{ "%.1f"|format(bmi) }}</strong>
+            <span class="chip" style="margin-left:4px">
+              {% if bmi < 18.5 %}Kurus{% elif bmi < 25 %}Normal{% elif bmi < 30 %}Berlebih{% else %}Obesitas{% endif %}
+            </span>
+          </td>
+        </tr>
+        {% endif %}
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="section-title">🔒 Ganti Password</div>
+      <form method="POST" action="{{ url_for('ganti_password') }}">
+        <div class="fgroup"><label>Password Lama</label><input name="password_lama" type="password" required placeholder="••••••" /></div>
+        <div class="fgroup"><label>Password Baru</label><input name="password_baru" type="password" required placeholder="Min. 6 karakter" /></div>
+        <button type="submit" class="btn">🔑 Ganti Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

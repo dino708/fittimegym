@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block auth_content %}
+<style>
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.auth-box{width:380px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:2rem}
+.auth-logo{font-size:24px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.auth-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+</style>
+<div class="auth-wrap">
+<div class="auth-box">
+  <div class="auth-logo">🏋️ FitTime Scheduler</div>
+  <div class="auth-sub">Sistem penjadwalan gym cerdas berbasis Greedy Algorithm</div>
+  {% with msgs=get_flashed_messages(with_categories=true) %}
+  {% for cat,msg in msgs %}
+  <div class="alert alert-{{ cat }}">{{ msg }}</div>
+  {% endfor %}
+  {% endwith %}
+  <div class="fgroup"><label>Username</label><input name="username" type="text" placeholder="Masukkan username" form="login-form" autofocus /></div>
+  <div class="fgroup"><label>Password</label><input name="password" type="password" placeholder="••••••" form="login-form" /></div>
+  <form id="login-form" method="POST" action="{{ url_for('login') }}">
+    <input name="username" type="hidden" />
+    <input name="password" type="hidden" />
+    <button type="submit" class="btn-primary" style="width:100%;justify-content:center">🔑 Masuk</button>
+  </form>
+  <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2)">
+    Belum punya akun? <a href="{{ url_for('register') }}">Daftar sebagai member</a>
+  </p>
+  <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r);font-size:12px;color:var(--text2)">
+    <strong>Demo:</strong><br>
+    Admin: <code>admin</code> / <code>admin123</code><br>
+    Member: <code>andi</code> / <code>member123</code>
+  </div>
+</div>
+</div>
+<script>
+document.querySelector('.btn-primary').addEventListener('click',function(e){
+  e.preventDefault();
+  document.querySelector('#login-form input[name=username]').value=document.querySelector('input[placeholder="Masukkan username"]').value;
+  document.querySelector('#login-form input[name=password]').value=document.querySelector('input[placeholder="••••••"]').value;
+  document.getElementById('login-form').submit();
+});
+document.querySelector('input[placeholder="••••••"]').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){document.querySelector('.btn-primary').click();}
+});
+</script>
+{% endblock %}

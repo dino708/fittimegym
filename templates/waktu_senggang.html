@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Waktu Senggang — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">⏰ Waktu Senggang Saya</div>
+</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">Tambah Waktu Senggang</div>
+    <form method="POST">
+      <div class="fgroup"><label>Hari</label>
+        <select name="hari">
+          {% for h in ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu','Setiap hari','Weekday','Weekend'] %}
+          <option>{{ h }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="fgroup"><label>Jam Mulai</label><input name="jam_mulai" type="time" value="07:00" required /></div>
+        <div class="fgroup"><label>Jam Selesai</label><input name="jam_selesai" type="time" value="09:00" required /></div>
+      </div>
+      <button type="submit" class="btn-primary">➕ Tambahkan</button>
+    </form>
+    <div style="margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--r);font-size:12px;color:var(--text2)">
+      💡 <strong>Tips:</strong> Isi waktu senggang Anda agar admin dapat merekomendasikan jadwal latihan yang cocok.
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">Daftar Waktu Senggang ({{ ws|length }})</div>
+    {% if ws %}
+    <table><thead><tr><th>Hari</th><th>Jam</th><th>Durasi</th><th></th></tr></thead><tbody>
+    {% for w in ws %}
+    <tr>
+      <td><strong>{{ w.hari }}</strong></td>
+      <td style="font-size:12px;color:var(--text2)">{{ w.jam_mulai }} — {{ w.jam_selesai }}</td>
+      <td>
+        {% set dur = (w.jam_selesai[:2]|int*60 + w.jam_selesai[3:]|int) - (w.jam_mulai[:2]|int*60 + w.jam_mulai[3:]|int) %}
+        <span class="chip">{{ dur }} mnt</span>
+      </td>
+      <td><a href="{{ url_for('hapus_ws', wid=w.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Hapus waktu senggang ini?')">🗑</a></td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada waktu senggang ditambahkan.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

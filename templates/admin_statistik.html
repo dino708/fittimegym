@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Statistik — FitTime Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">📈 Statistik Penggunaan Gym</div>
+</div>
+
+<div class="grid-4" style="margin-bottom:14px">
+  <div class="stat-card"><div class="stat-lbl">👥 Total Member</div><div class="stat-val">{{ total_member }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">📅 Total Jadwal</div><div class="stat-val">{{ total_jadwal }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">🏆 Alat Terpopuler</div><div class="stat-val" style="font-size:16px">{{ alat_populer[0].nama if alat_populer else '—' }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">⏰ Jam Paling Ramai</div><div class="stat-val" style="font-size:20px">{{ jam_ramai[0].jam ~ ':00' if jam_ramai else '—' }}</div></div>
+</div>
+
+<div class="grid-2" style="margin-bottom:14px">
+  <div class="card">
+    <div class="section-title">🏋️ Penggunaan per Alat Gym</div>
+    {% if alat_populer %}
+    {% set max_c = alat_populer[0].cnt %}
+    {% for a in alat_populer %}
+    <div class="bar-row">
+      <div class="bar-lbl" title="{{ a.nama }}">{{ a.nama }}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (a.cnt / max_c * 100)|int }}%;background:#185FA5"></div>
+      </div>
+      <div class="bar-num">{{ a.cnt }}</div>
+    </div>
+    {% endfor %}
+    {% else %}<div class="empty">Belum ada data</div>{% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title">⏰ Distribusi Jam Latihan</div>
+    {% if jam_ramai %}
+    {% set max_j = jam_ramai[0].cnt %}
+    {% for j in jam_ramai %}
+    <div class="bar-row">
+      <div class="bar-lbl">{{ j.jam }}:00 – {{ (j.jam|int + 1) }}:00</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (j.cnt / max_j * 100)|int }}%;background:#3B6D11"></div>
+      </div>
+      <div class="bar-num">{{ j.cnt }}</div>
+    </div>
+    {% endfor %}
+    {% else %}<div class="empty">Belum ada data</div>{% endif %}
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title">📆 Jadwal per Hari (14 Hari Terakhir)</div>
+    {% if per_hari %}
+    {% set max_h = per_hari|map(attribute='cnt')|max %}
+    {% for p in per_hari %}
+    <div class="bar-row">
+      <div class="bar-lbl">{{ p.tanggal }}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (p.cnt / max_h * 100)|int }}%;background:#854F0B"></div>
+      </div>
+      <div class="bar-num">{{ p.cnt }}</div>
+    </div>
+    {% endfor %}
+    {% else %}<div class="empty">Belum ada data</div>{% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title">🎯 Tujuan Latihan Member</div>
+    {% if tujuan %}
+    {% set max_t = tujuan[0].cnt %}
+    {% for t in tujuan %}
+    <div class="bar-row">
+      <div class="bar-lbl" title="{{ t.tujuan_latihan }}">{{ t.tujuan_latihan }}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:{{ (t.cnt / max_t * 100)|int }}%;background:#993556"></div>
+      </div>
+      <div class="bar-num">{{ t.cnt }}</div>
+    </div>
+    {% endfor %}
+    {% else %}<div class="empty">Belum ada data tujuan latihan</div>{% endif %}
+  </div>
+</div>
+{% endblock %}

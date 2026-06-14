@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Beranda — FitTime{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">🏠 Halo, {{ session.nama }}!</div>
+  <a href="{{ url_for('jadwal_member') }}" class="btn btn-primary">➕ Daftar Jadwal</a>
+</div>
+
+<div class="grid-3" style="margin-bottom:14px">
+  <div class="stat-card"><div class="stat-lbl">📅 Total Jadwal Saya</div><div class="stat-val">{{ my_jadwal|length }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">✅ Jadwal Aman</div><div class="stat-val" style="color:var(--green)">{{ my_jadwal|length - my_jadwal|selectattr('id','in',clashes)|list|length }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">⏰ Waktu Senggang</div><div class="stat-val">{{ ws|length }}</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="section-title" style="display:flex;justify-content:space-between">
+      Jadwal Latihan Saya
+      <a href="{{ url_for('jadwal_member') }}" class="btn btn-sm">Kelola →</a>
+    </div>
+    {% if my_jadwal %}
+    <table><thead><tr><th>Alat</th><th>Tanggal</th><th>Waktu</th><th>Status</th></tr></thead><tbody>
+    {% for j in my_jadwal[:6] %}
+    <tr>
+      <td><span class="chip">{{ j.alat_nama }}</span></td>
+      <td style="font-size:12px">{{ j.tanggal }}</td>
+      <td style="font-size:12px;color:var(--text2)">{{ j.jam_mulai }}–{{ j.jam_selesai }}</td>
+      <td>{% if j.id in clashes %}<span class="badge b-clash">⚠ Bentrok</span>{% elif j.status=='approved' %}<span class="badge b-ok">✓ Disetujui</span>{% elif j.status=='rejected' %}<span class="badge b-clash">✗ Ditolak</span>{% else %}<span class="badge b-gray">Menunggu</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada jadwal. <a href="{{ url_for('jadwal_member') }}">Daftar sekarang →</a></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="section-title" style="display:flex;justify-content:space-between">
+      Waktu Senggang Saya
+      <a href="{{ url_for('waktu_senggang') }}" class="btn btn-sm">Kelola →</a>
+    </div>
+    {% if ws %}
+    <table><thead><tr><th>Hari</th><th>Jam</th></tr></thead><tbody>
+    {% for w in ws %}
+    <tr>
+      <td>{{ w.hari }}</td>
+      <td style="font-size:12px;color:var(--text2)">{{ w.jam_mulai }}–{{ w.jam_selesai }}</td>
+    </tr>
+    {% endfor %}
+    </tbody></table>
+    {% else %}
+    <div class="empty">Belum ada waktu senggang. <a href="{{ url_for('waktu_senggang') }}">Tambah →</a></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

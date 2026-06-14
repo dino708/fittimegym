@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Data Member — FitTime Admin{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">👥 Data Member ({{ members|length }})</div>
+</div>
+{% if members %}
+<div class="card">
+  <table><thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>No. HP</th><th>BB/TB</th><th>Tujuan</th><th>Bergabung</th><th></th></tr></thead><tbody>
+  {% for m in members %}
+  <tr>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="avatar">{{ m.nama_lengkap[:2].upper() if m.nama_lengkap else m.username[:2].upper() }}</div>
+        <strong>{{ m.nama_lengkap or m.username }}</strong>
+      </div>
+    </td>
+    <td><code>{{ m.username }}</code></td>
+    <td style="font-size:12px">{{ m.email or '—' }}</td>
+    <td style="font-size:12px">{{ m.no_hp or '—' }}</td>
+    <td style="font-size:12px">{{ m.berat_badan or '?' }}kg / {{ m.tinggi_badan or '?' }}cm</td>
+    <td><span class="chip" style="font-size:11px">{{ m.tujuan_latihan or '—' }}</span></td>
+    <td style="font-size:11px;color:var(--text3)">{{ m.created_at[:10] }}</td>
+    <td style="white-space:nowrap">
+      <a href="{{ url_for('admin_member_detail', uid=m.id) }}" class="btn btn-sm">👁 Detail</a>
+      <a href="{{ url_for('hapus_member', uid=m.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Hapus member {{ m.nama_lengkap }}?')">🗑</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+{% else %}
+<div class="card"><div class="empty">Belum ada member terdaftar.</div></div>
+{% endif %}
+{% endblock %}
