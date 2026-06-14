@@ -3,8 +3,8 @@ import sqlite3, hashlib, os
 from datetime import datetime, date
 
 app = Flask(__name__)
-app.secret_key = 'fittime-secret-2025'
-DB = 'fittime.db'
+app.secret_key = os.environ.get('SECRET_KEY', 'fittime-secret-2025')
+DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fittime.db')
 
 # ─── DATABASE ───────────────────────────────────────────────────────────────
 
@@ -220,12 +220,12 @@ def login():
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method=='POST':
-        uname = request.form['username'].strip()
-        pw = request.form['password']
-        nama = request.form['nama_lengkap'].strip()
+        uname = request.form.get('username','').strip()
+        pw = request.form.get('password','')
+        nama = request.form.get('nama_lengkap','').strip()
         email = request.form.get('email','')
-        if len(pw)<6:
-            flash('Password minimal 6 karakter.','danger')
+        if not uname or not pw or not nama:
+            flash('Nama lengkap, username, dan password wajib diisi.','danger')
             return render_template('register.html')
         try:
             with get_db() as db:
