@@ -384,6 +384,8 @@ def hapus_jadwal_member(jid):
 
 # ─── ADMIN: SEMUA JADWAL ────────────────────────────────────────────────────
 
+# ─── ADMIN: SEMUA JADWAL ────────────────────────────────────────────────────
+
 @app.route('/admin/jadwal')
 @login_required('admin')
 def admin_jadwal():
@@ -400,23 +402,25 @@ def admin_jadwal():
         return render_template('admin_jadwal.html', rows=rows, clashes=clashes,
             greedy=greedy, tanggal=tanggal)
 
-@app.route('/admin/jadwal/approve/<int:jid>', methods=['GET','POST'])
+
+# FIX: Duplikasi route yang menggantung sudah dihapus
+@app.route('/admin/jadwal/approve/<int:jid>', methods=['POST'])
 @login_required('admin')
 def approve_jadwal(jid):
     with get_db() as db:
-        db.execute("UPDATE jadwal SET status='approved' WHERE id=?",(jid,))
+        db.execute("UPDATE jadwal SET status='approved' WHERE id=?", (jid,))
         db.commit()
-    flash('Jadwal disetujui.','success')
-    return redirect(request.referrer or url_for('admin_jadwal'))
+    return jsonify({'status': 'success', 'message': 'Jadwal disetujui', 'new_status': 'approved'})
 
-@app.route('/admin/jadwal/reject/<int:jid>', methods=['GET','POST'])
+
+@app.route('/admin/jadwal/reject/<int:jid>', methods=['POST'])
 @login_required('admin')
 def reject_jadwal(jid):
     with get_db() as db:
-        db.execute("UPDATE jadwal SET status='rejected' WHERE id=?",(jid,))
+        db.execute("UPDATE jadwal SET status='rejected' WHERE id=?", (jid,))
         db.commit()
-    flash('Jadwal ditolak.','info')
-    return redirect(request.referrer or url_for('admin_jadwal'))
+    return jsonify({'status': 'success', 'message': 'Jadwal ditolak', 'new_status': 'rejected'})
+
 
 @app.route('/admin/jadwal/hapus/<int:jid>')
 @login_required('admin')
@@ -426,7 +430,6 @@ def hapus_jadwal_admin(jid):
         db.commit()
     flash('Jadwal dihapus.','info')
     return redirect(request.referrer or url_for('admin_jadwal'))
-
 # ─── ADMIN: MEMBER ──────────────────────────────────────────────────────────
 
 @app.route('/admin/member')

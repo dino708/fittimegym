@@ -24,9 +24,9 @@
 {% endfor %}
 
 <div class="grid-4" style="margin-bottom:14px">
-  <div class="stat-card"><div class="stat-lbl">📥 Total Permintaan</div><div class="stat-val">{{ rows|length }}</div></div>
-  <div class="stat-card"><div class="stat-lbl">⚡ Dipilih Greedy</div><div class="stat-val" style="color:var(--green)">{{ total_pick.n }}</div></div>
-  <div class="stat-card"><div class="stat-lbl">↷ Dilewati</div><div class="stat-val" style="color:var(--amber)">{{ total_skip.n }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">📥 Total Permintaan</div><div class="stat-val" id="global-total">{{ rows|length }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">⚡ Dipilih Greedy</div><div class="stat-val" id="global-pick" style="color:var(--green)">{{ total_pick.n }}</div></div>
+  <div class="stat-card"><div class="stat-lbl">↷ Dilewati</div><div class="stat-val" id="global-skip" style="color:var(--amber)">{{ total_skip.n }}</div></div>
   <div class="stat-card"><div class="stat-lbl">⚠️ Bentrok</div><div class="stat-val" style="color:{% if clashes %}var(--red){% else %}var(--green){% endif %}">{{ clashes|length }}</div></div>
 </div>
 
@@ -34,10 +34,11 @@
 <div class="card" style="margin-bottom:12px">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
     <div style="font-size:15px;font-weight:800">🏋️ {{ alat_nama }}</div>
+
     <div style="display:flex;gap:8px;align-items:center">
-      <span class="badge b-ok">{{ data.selected|length }} dipilih</span>
+      <span class="badge b-ok badge-pick">{{ data.selected|length }} dipilih</span>
       {% if data.jadwal|length - data.selected|length > 0 %}
-      <span class="badge b-warn">{{ data.jadwal|length - data.selected|length }} dilewati</span>
+      <span class="badge b-warn badge-skip">{{ data.jadwal|length - data.selected|length }} dilewati</span>
       {% endif %}
     </div>
   </div>
@@ -53,21 +54,18 @@
       {% set mul_h = j.jam_mulai[:2]|int %}{% set mul_m = j.jam_mulai[3:]|int %}
       {{ dur_h*60+dur_m - mul_h*60-mul_m }} mnt
     </td>
-    <td>
+
+    <td id="status-{{ j.id }}" class="status-cell" data-prev="{% if j.id in data.selected %}approved{% else %}rejected{% endif %}">
       {% if j.id in data.selected %}
         <span class="badge b-ok">⚡ Dipilih</span>
       {% else %}
         <span class="badge b-warn">↷ Dilewati</span>
       {% endif %}
     </td>
+
     <td style="white-space:nowrap">
-      <!-- FIXME: -->
-      <form method="POST" action="{{ url_for('approve_jadwal', jid=j.id) }}" style="display:inline" onsubmit="return confirm('Setujui jadwal ini?')">
-        <button type="submit" class="btn btn-sm btn-success">✓</button>
-      </form>
-      <form method="POST" action="{{ url_for('reject_jadwal', jid=j.id) }}" style="display:inline" onsubmit="return confirm('Tolak jadwal ini?')">
-        <button type="submit" class="btn btn-sm btn-danger">✗</button>
-      </form>
+      <button onclick="updateStatus({{ j.id }}, 'approve')" class="btn btn-sm btn-success" title="Setujui">✓</button>
+      <button onclick="updateStatus({{ j.id }}, 'reject')" class="btn btn-sm btn-danger" title="Tolak">✗</button>
       <a href="{{ url_for('hapus_jadwal_admin', jid=j.id) }}" class="btn btn-sm" onclick="return confirm('Hapus jadwal ini?')" title="Hapus">🗑</a>
     </td>
   </tr>
@@ -79,4 +77,68 @@
 {% else %}
 <div class="card"><div class="empty">Tidak ada jadwal untuk tanggal {{ tanggal }}.</div></div>
 {% endif %}
+
+<script>
+function updateStatus(jadwalId, aksi) {
+    fetch(`/admin/jadwal/${aksi}/${jadwalId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const statusTarget = document.getElementById(`status-${jadwalId}`);
+            const previousStatus = statusTarget.getAttribute('data-prev');
+            const currentStatus = data.new_status;
+
+            // Jika status tidak berubah dari aksi sebelumnya, lewati kalkulasi ulang
+            if (previousStatus === currentStatus) return;
+
+            // 1. Update UI Status Baris Tabel
+            if (currentStatus === 'approved') {
+                statusTarget.innerHTML = '<span class="badge b-ok">⚡ Dipilih</span>';
+            } else if (currentStatus === 'rejected') {
+                statusTarget.innerHTML = '<span class="badge b-warn">↷ Dilewati</span>';
+            }
+            statusTarget.setAttribute('data-prev', currentStatus);
+
+            // 2. Update Counter Stat Card Global Teratas
+            const globalPick = document.getElementById('global-pick');
+            const globalSkip = document.getElementById('global-skip');
+            let currentPickVal = parseInt(globalPick.innerText);
+            let currentSkipVal = parseInt(globalSkip.innerText);
+
+            if (currentStatus === 'approved' && previousStatus === 'rejected') {
+                globalPick.innerText = currentPickVal + 1;
+                globalSkip.innerText = currentSkipVal - 1;
+            } else if (currentStatus === 'rejected' && previousStatus === 'approved') {
+                globalPick.innerText = currentPickVal - 1;
+                globalSkip.innerText = currentSkipVal + 1;
+            }
+
+            // 3. Update Counter Badge Per Tabel Alat
+            const parentCard = statusTarget.closest('.card');
+            const badgePick = parentCard.querySelector('.badge-pick');
+            const badgeSkip = parentCard.querySelector('.badge-skip');
+
+            if (badgePick) {
+                let pVal = parseInt(badgePick.innerText);
+                badgePick.innerText = (currentStatus === 'approved') ? `${pVal + 1} dipilih` : `${pVal - 1} dipilih`;
+            }
+            if (badgeSkip) {
+                let sVal = parseInt(badgeSkip.innerText);
+                badgeSkip.innerText = (currentStatus === 'rejected') ? `${sVal + 1} dilewati` : `${sVal - 1} dilewati`;
+            }
+        } else {
+            alert('Gagal memperbarui status basis data.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan koneksi ke server.');
+    });
+}
+</script>
 {% endblock %}

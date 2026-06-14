@@ -1,11 +1,9 @@
-# 🏋️ FitTime Scheduler
+# 🏋itTime Scheduler
 
 Sistem penjadwalan gym berbasis **Algoritma Greedy** dengan database SQLite.
 Dibangun menggunakan Python + Flask.
 
----
-
-## 📋 Fitur
+## Fitur
 
 ### Admin
 - Dashboard ringkasan (member, jadwal, bentrok)
@@ -24,7 +22,7 @@ Dibangun menggunakan Python + Flask.
 
 ---
 
-## 🚀 Cara Menjalankan
+## Cara Menjalankan
 
 ### 1. Pastikan Python terinstal
 ```bash
@@ -48,7 +46,7 @@ http://localhost:5000
 
 ---
 
-## 🔑 Akun Default
+## Akun Default
 
 | Role   | Username | Password   |
 |--------|----------|------------|
@@ -61,7 +59,7 @@ http://localhost:5000
 
 ---
 
-## 🗂️ Struktur Proyek
+## truktur Proyek
 
 ```
 fittime/
@@ -86,7 +84,7 @@ fittime/
 
 ---
 
-## ⚙️ Algoritma Greedy
+## Algoritma Greedy
 
 **Metode:** Earliest Finish Time (EFT)
 
@@ -99,7 +97,7 @@ fittime/
 
 ---
 
-## 🗃️ Struktur Database
+## Struktur Database
 
 | Tabel            | Isi                                      |
 |------------------|------------------------------------------|
