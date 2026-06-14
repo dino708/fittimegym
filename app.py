@@ -174,7 +174,7 @@ def greedy_schedule(jadwal_list):
         for it in sorted_items:
             if to_min(it['jam_mulai']) >= last_end:
                 selected.append(it['id']); last_end = to_min(it['jam_selesai'])
-        result[alat] = {'items': sorted_items, 'selected': selected}
+        result[alat] = result[alat] = {'jadwal': sorted_items, 'selected': selected}
     return result
 
 def login_required(role=None):

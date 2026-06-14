@@ -20,7 +20,7 @@
 {% set total_skip = namespace(n=0) %}
 {% for alat_nama, data in greedy.items() %}
   {% set total_pick.n = total_pick.n + data.selected|length %}
-  {% set total_skip.n = total_skip.n + data.items|length - data.selected|length %}
+  {% set total_skip.n = total_skip.n + data.jadwal|length - data.selected|length %}
 {% endfor %}
 
 <div class="grid-4" style="margin-bottom:14px">
@@ -36,13 +36,13 @@
     <div style="font-size:15px;font-weight:800">🏋️ {{ alat_nama }}</div>
     <div style="display:flex;gap:8px;align-items:center">
       <span class="badge b-ok">{{ data.selected|length }} dipilih</span>
-      {% if data.items|length - data.selected|length > 0 %}
-      <span class="badge b-warn">{{ data.items|length - data.selected|length }} dilewati</span>
+      {% if data.jadwal|length - data.selected|length > 0 %}
+      <span class="badge b-warn">{{ data.jadwal|length - data.selected|length }} dilewati</span>
       {% endif %}
     </div>
   </div>
   <table><thead><tr><th>#</th><th>Member</th><th>Mulai</th><th>Selesai</th><th>Durasi</th><th>Greedy</th><th>Aksi Admin</th></tr></thead><tbody>
-  {% for j in data.items %}
+  {% for j in data.jadwal %}
   <tr {% if j.id in clashes %}style="background:var(--red-bg)"{% endif %}>
     <td style="color:var(--text3)">{{ loop.index }}</td>
     <td><strong>{{ j.nama }}</strong></td>
